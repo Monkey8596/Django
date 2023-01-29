@@ -1,6 +1,7 @@
 import datetime
 
 from django.test import TestCase
+from django.urls.base import reverse
 from django.utils import timezone
 
 from .models import Question
@@ -46,5 +47,34 @@ class QuestionModelTests(TestCase):
         time = timezone.now()
         recent_question = Question( question_text='Whos is the best Course Director on Platzi' , pub_date = time )
         self.assertIs(recent_question.was_published_recently(), True)
+
+
+class QuestionIndexViewTests(TestCase):
+
+    def test_no_questions(self):
+        '''
+        
+        If no question exist, an appropiate message is displpayed
+        
+        '''
+
+        response = self.client.get(reverse('polls:index'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'No polls are available')
+        self.assertQuerysetEqual(response.context['latest_question_list'],[])
+
+    def  test_no_future_questions(self):
+        
+        '''
+        
+        Question created in the future is not included in latest_question_list
+        
+        '''
+
+        time = timezone.now() + datetime.timedelta(days=30)
+        future_question = Question( question_text='Whos is the best Course Director on Platzi' , pub_date = time )
+        #future_question.save()
+        response = self.client.get(reverse('polls:index'))
+        self.assertNotIn(future_question, response.context['latest_question_list'])
 
     

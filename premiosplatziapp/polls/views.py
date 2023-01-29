@@ -3,6 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse,HttpResponseRedirect
 from django.urls import reverse
 from django.views import generic
+from django.utils import timezone
 
 from .models import Question, Choice
 
@@ -35,7 +36,7 @@ class IndexView(generic.ListView):
 
         ''' Return the last five published questions '''
           
-        return Question.objects.order_by('-pub_date')[:5]
+        return Question.objects.filter( pub_date__lte=timezone.now()).order_by ('-pub_date')[:5]
 
 
 class DetailView(generic.DeleteView ):
