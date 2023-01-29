@@ -7,26 +7,6 @@ from django.utils import timezone
 
 from .models import Question, Choice
 
-# def index(request):
-#     latest_question_list = Question.objects.all()
-#     return render(request, 'polls/index.html', {
-#         'latest_question_list': latest_question_list
-#     } )
-
-
-# def detail(request, question_id):
-#     question = get_object_or_404(Question, pk=question_id)
-#     return render(request,"polls/detail.html",{
-#         'question': question
-#     })
-
-
-# def results(request, question_id):
-#     question = get_object_or_404(Question, pk=question_id)
-#     return render(request, 'polls/results.html',{
-#         'question': question
-#     } )
-
 
 class IndexView(generic.ListView):
     template_name = 'polls/index.html'
@@ -42,6 +22,17 @@ class IndexView(generic.ListView):
 class DetailView(generic.DeleteView ):
     model = Question
     template_name = 'polls/detail.html'
+
+    def get_queryset(self):
+        
+        '''
+        
+        Excludes any questions that arent published yet 
+        
+        '''
+
+        return Question.objects.filter(pub_date__lte=timezone.now()) 
+
 
 class ResultView(generic.DetailView):
     model = Question
