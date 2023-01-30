@@ -198,9 +198,6 @@ class TestResultView(TestCase):
         self.assertNotContains(response, f'{choice.choice_text} -- {choice.votes} votes')
 
 
-
-class TestAdmin(TestCase):
-
     def test_to_validated_the_question_has_answers(self):
 
         '''
