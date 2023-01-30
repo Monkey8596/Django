@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.urls.base import reverse
 from django.utils import timezone
 
-from .models import Question
+from .models import Question, Choice
 
 
 # Models
@@ -151,6 +151,7 @@ class QuestionIndexViewTests(TestCase):
         self.assertQuerysetEqual(response.context['latest_question_list'],[])
 
 
+
 class QuestionDetailViewTest(TestCase):
     
     def test_future_question(self):
@@ -179,6 +180,37 @@ class QuestionDetailViewTest(TestCase):
         url = reverse('polls:detail',args=(past_question.id,))
         response = self.client.get(url)
         self.assertContains(response, past_question.question_text)
+
+
+
+class TestResultView(TestCase):
+
+    def test_question_votes(self):
+
+        '''
+        
+        Validate that the vote answers are reflected 
+        
+        '''
+        question = create_question('Question12', days=-30)
+        choice = Choice(choice_text='choice12', votes=1, question_id=question)
+        response = self.client.get(reverse('polls:results', args=(question.pk,)))
+        self.assertNotContains(response, f'{choice.choice_text} -- {choice.votes} votes')
+
+
+
+class TestAdmin(TestCase):
+
+    def test_to_validated_the_question_has_answers(self):
+
+        '''
+        
+        Question with no choices return a 404 error not found
+        
+        '''
+        question = create_question('Question', days=-30)
+        response = self.client.get('polls:results')
+        self.assertEqual(response.status_code, 404)
 
 
     
